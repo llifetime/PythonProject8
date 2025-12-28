@@ -6,6 +6,30 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .forms import UserRegisterForm, UserLoginForm
 from .models import User
+from django.views.generic.edit import UpdateView
+from django.http import HttpResponseForbidden
+from django.contrib.auth.mixins import UserPassesTestMixin
+from .models import BlogPost
+
+
+
+class EditBlogPostView(UserPassesTestMixin, UpdateView):
+    model = BlogPost
+    fields = ['title', 'content']  # Здесь перечисляем поля, доступные для редактирования
+    template_name = 'blog/edit_blog_post.html'  # Название шаблона
+    success_url = '/blog/'  # Адрес перенаправления после успешного сохранения
+
+    def test_func(self):
+        """
+        Проверяем, что пользователь является контент-менеджером.
+        """
+        return self.request.user.groups.filter(name='Контент-менеджеры').exists()
+
+    def handle_no_permission(self):
+        """
+        Генерируем специальный ответ, если пользователь не прошел проверку.
+        """
+        return HttpResponseForbidden("Только контент-менеджеры могут редактировать посты.")
 
 class UserRegisterView(CreateView):
     model = User
