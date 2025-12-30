@@ -19,13 +19,21 @@
         <p>{{ product.description }}</p>
         
         {% if user.is_authenticated %}
-            <div class="mt-4">
-                {% if user == product.owner or user.has_perm('catalog.can_manage_products') %}
-                    <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">Редактировать</a>
-                    <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
-                {% endif %}
-                <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">Назад к списку</a>
-            </div>
+        <div class="mt-4">
+            {% if user == product.owner %}
+                <a href="{% url 'catalog:product_update' product.pk %}" class="btn btn-warning">Редактировать</a>
+            {% endif %}
+            {% if user == product.owner or user.has_perm('catalog.delete_product') %}
+                <a href="{% url 'catalog:product_delete' product.pk %}" class="btn btn-danger">Удалить</a>
+            {% endif %}
+            {% if user.has_perm('catalog.can_unpublish_product') and product.publish_status == 'published' %}
+                <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}" style="display: inline;">
+                    {% csrf_token %}
+                     <button type="submit" class="btn btn-secondary">Снять с публикации</button>
+                </form>
+            {% endif %}
+            <a href="{% url 'catalog:product_list' %}" class="btn btn-secondary">Назад к списку</a>
+        </div>
         {% endif %}
     </div>
 </div>

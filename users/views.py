@@ -8,16 +8,14 @@ from .forms import UserRegisterForm, UserLoginForm
 from .models import User
 from django.views.generic.edit import UpdateView
 from django.http import HttpResponseForbidden
-from django.contrib.auth.mixins import UserPassesTestMixin
 from .models import BlogPost
 
 
 
-class EditBlogPostView(UserPassesTestMixin, UpdateView):
+class EditBlogPostView(UpdateView):
     model = BlogPost
-    fields = ['title', 'content']  # Здесь перечисляем поля, доступные для редактирования
-    template_name = 'blog/edit_blog_post.html'  # Название шаблона
-    success_url = '/blog/'  # Адрес перенаправления после успешного сохранения
+    fields = ['title', 'content']  # Добавьте нужные поля
+    template_name = 'users/edit_blog_post.html'
 
     def test_func(self):
         """

@@ -82,9 +82,10 @@ class Product(models.Model):
         return self.owner == user
 
     def can_be_deleted_by(self, user):
-        """Проверяет, может ли пользователь удалить товар"""
-        # Может удалить владелец или пользователь с правом удаления любого товара
-        return self.owner == user or user.has_perm('products.delete_product')
+        return (
+                self.owner == user or
+                user.has_perm('catalog.delete_product')  # ✅ Исправленное приложение
+        )
 
 
 # ДЛЯ ДОПОЛНИТЕЛЬНОГО ЗАДАНИЯ (если нужно)

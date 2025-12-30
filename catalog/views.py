@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from .models import Product
 from .forms import ProductForm
 from django.shortcuts import redirect
-from django.http import HttpResponseForbidden, HttpResponse
+from django.http import HttpResponseForbidden
 
 
 class UnpublishProductView(SingleObjectMixin, RedirectView):
@@ -15,8 +15,8 @@ class UnpublishProductView(SingleObjectMixin, RedirectView):
 
     def post(self, request, *args, **kwargs):
         product = self.get_object()
-        if request.user.has_perm('catalog.can_unpublish_product'):  # Исправленное пространство имён
-            product.published = False
+        if request.user.has_perm('catalog.can_unpublish_product'):
+            product.publish_status = 'unpublished'  # ✅ ИСПРАВЛЕНО
             product.save()
             return redirect(reverse_lazy('catalog:product_list'))
         else:
@@ -77,11 +77,12 @@ class ProductDeleteView(LoginRequiredMixin, DeleteView):
     login_url = reverse_lazy('users:login')
 
     def dispatch(self, request, *args, **kwargs):
-        """
-        Проверяем, может ли текущий пользователь удалить продукт.
-        Доступ открыт только владельцу продукта или пользователям с полномочиями.
-        """
         product = self.get_object()
-        if product.owner != self.request.user and not self.request.user.has_perm('catalog.delete_product'):
+        can_delete = (
+                product.owner == request.user or
+                request.user.has_perm('catalog.delete_product') or
+                request.user.groups.filter(name='Модератор продуктов').exists()
+        )
+        if not can_delete:
             return HttpResponseForbidden("Вы не можете удалить этот продукт.")
         return super().dispatch(request, *args, **kwargs)
