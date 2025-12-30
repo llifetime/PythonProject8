@@ -2,7 +2,7 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-test-key-12345'
+SECRET_KEY = 'django-insecure-test-key-123456789'
 DEBUG = True
 ALLOWED_HOSTS = []
 
@@ -13,6 +13,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    
     'users',
     'catalog',
 ]
@@ -61,11 +62,12 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# КРИТИЧЕСКИ ВАЖНЫЕ НАСТРОЙКИ:
 AUTH_USER_MODEL = 'users.User'
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'noreply@example.com'
-LOGOUT_REDIRECT_URL = '/'
+WSGI_APPLICATION = 'DjangoProject.wsgi.application'  # ← ИСПРАВЛЕНО!
