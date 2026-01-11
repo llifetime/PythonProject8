@@ -1,0 +1,30 @@
+<!-- templates/products/_product_card.html -->
+{% load cache %}
+
+{% cache 600 product_card product.id product.updated_at|date:"U" %}
+<div class="card h-100 product-card">
+    <div class="card-img-top">
+        {% if product.images.first %}
+            <img src="{{ product.images.first.image.url }}"
+                 alt="{{ product.name }}"
+                 class="img-fluid"
+                 loading="lazy">
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <h6 class="card-title">{{ product.name }}</h6>
+        <p class="card-text text-muted small">
+            {{ product.short_description|truncatewords:10 }}
+        </p>
+        <p class="card-text">
+            <strong>${{ product.price }}</strong>
+        </p>
+    </div>
+    <div class="card-footer">
+        <a href="{% url 'product_detail' product.slug %}"
+           class="btn btn-sm btn-outline-primary">
+            Подробнее
+        </a>
+    </div>
+</div>
+{% endcache %}
